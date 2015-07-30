@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Cardboard Example</title>
+    <title>VRPore - 3D Demo of a Nanopore</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <style>
@@ -110,24 +110,26 @@
       mesh.rotation.x = -Math.PI / 2;
       scene.add(mesh);
 	  
-	  var sphere = new THREE.SphereGeometry( 3, 16, 16 );
+	  
+	  
+	  // Draw atoms
+	  var radius_of_atoms = 2;
+	  var sides = 6;
+	  var center = 30;
+	  var radius_of_molecule = 7;
+	  var secangle = 2*Math.PI/sides;
+	  var height = 10;
+	  var sphere = new THREE.SphereGeometry( radius_of_atoms, 16, 16 );
 	  var material = new THREE.MeshBasicMaterial( { 
 		  color: 0xac154b,
 		  specular: 0xffffff,
 		  shininess: 20,
 		  wireframe:true
 	  } );
-	  
-	  // Draw atoms
-	  var sides = 6;
-	  var center = 30;
-	  var radius = 10;
-	  var secangle = 2*Math.PI/sides;
-	  var height = 10;
 	  for (i=0; i<sides; i++){
 		var mesh = new THREE.Mesh( sphere, material );
-	  	mesh.position.x = center+radius*Math.cos(secangle*i);
-		mesh.position.z = center+radius*Math.sin(secangle*i);
+	  	mesh.position.x = center+radius_of_molecule*Math.cos(secangle*i);
+		mesh.position.z = center+radius_of_molecule*Math.sin(secangle*i);
 		mesh.position.y = height;
 	  	scene.add( mesh );
 		spheres.push( mesh );
