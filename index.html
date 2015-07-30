@@ -43,8 +43,13 @@
 	  
 	  // Renderer
       renderer = new THREE.WebGLRenderer();
+	  renderer.shadowMapEnabled = true;
+	  renderer.shadowMapType = THREE.PCFSoftShadowMap;
+	  
+
 	  // Canvas to draw created by the renderer
       element = renderer.domElement;
+	  
 	  // Add canvas to element
       container = document.getElementById('example');
       container.appendChild(element);
@@ -85,8 +90,21 @@
       window.addEventListener('deviceorientation', setOrientationControls, true);
 
 
-      var light = new THREE.HemisphereLight(0x777777, 0x000000, 0.6);
-      scene.add(light);
+	  var spotLight = new THREE.SpotLight( 0xffffff, 0.5);
+	  spotLight.position.set( 100, 100, 100 );
+	  
+	  spotLight.castShadow = true;
+
+	  spotLight.shadowMapWidth = 1024;
+	  spotLight.shadowMapHeight = 1024;
+
+	  spotLight.shadowCameraNear = 10;
+	  spotLight.shadowCameraFar = 70;
+	  spotLight.shadowCameraFov = 20;
+
+	  scene.add( spotLight );
+	  
+      
 
       var texture = THREE.ImageUtils.loadTexture(
         'textures/patterns/checker.png'
@@ -110,27 +128,28 @@
       mesh.rotation.x = -Math.PI / 2;
       scene.add(mesh);
 	  
-	  
-	  
 	  // Draw atoms
 	  var radius_of_atoms = 2;
+	  var res = 32;
 	  var sides = 6;
 	  var center = 30;
 	  var radius_of_molecule = 7;
 	  var secangle = 2*Math.PI/sides;
-	  var height = 10;
-	  var sphere = new THREE.SphereGeometry( radius_of_atoms, 16, 16 );
-	  var material = new THREE.MeshBasicMaterial( { 
-		  color: 0xac154b,
+	  var height = 2;
+	  var sphere = new THREE.SphereGeometry( radius_of_atoms, res, res );
+	  var material = new THREE.MeshPhongMaterial( { 
+		  color: 0xC94141,
 		  specular: 0xffffff,
-		  shininess: 20,
-		  wireframe:true
+		  shininess: 15
 	  } );
+	  
 	  for (i=0; i<sides; i++){
 		var mesh = new THREE.Mesh( sphere, material );
 	  	mesh.position.x = center+radius_of_molecule*Math.cos(secangle*i);
 		mesh.position.z = center+radius_of_molecule*Math.sin(secangle*i);
 		mesh.position.y = height;
+		mesh.castShadow= true;
+		mesh.receiveShadow = true;
 	  	scene.add( mesh );
 		spheres.push( mesh );
   	  }	
