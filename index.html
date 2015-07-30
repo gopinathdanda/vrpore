@@ -129,19 +129,21 @@
       scene.add(mesh);
 	  
 	  // Draw atoms
-	  var radius_of_atoms = 2;
+	  var radius_of_atoms = 3;
 	  var res = 32;
 	  var sides = 6;
 	  var center = 30;
-	  var radius_of_molecule = 7;
+	  var radius_of_molecule = 10;
 	  var secangle = 2*Math.PI/sides;
 	  var height = 2;
 	  var sphere = new THREE.SphereGeometry( radius_of_atoms, res, res );
-	  var material = new THREE.MeshPhongMaterial( { 
-		  color: 0xC94141,
-		  specular: 0xffffff,
-		  shininess: 15
+	  var material = new THREE.MeshLambertMaterial( { 
+		  color: 0xC94141
 	  } );
+	  var ambientLight = new THREE.AmbientLight( 0xffffff );
+	  scene.add( ambientLight );
+	  var ka = 0.7;
+	  material.ambient.setRGB(material.color.r*ka, material.color.g*ka, material.color.b*ka);
 	  
 	  for (i=0; i<sides; i++){
 		var mesh = new THREE.Mesh( sphere, material );
