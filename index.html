@@ -30,24 +30,33 @@
     var camera, scene, renderer;
     var effect, controls;
     var element, container;
-
+	var spheres = [];
+	
+	// Object for keeping track of time
     var clock = new THREE.Clock();
 
     init();
     animate();
 
+	// Initialize scene
     function init() {
+	  
+	  // Renderer
       renderer = new THREE.WebGLRenderer();
+	  // Canvas to draw created by the renderer
       element = renderer.domElement;
+	  // Add canvas to element
       container = document.getElementById('example');
       container.appendChild(element);
-
+	  
+	  // 3D effect from separate modules
+	  // ParallaxBarrierEffect, StereoEffect, AnaglyphEffect
       effect = new THREE.StereoEffect(renderer);
 
       scene = new THREE.Scene();
 
-      camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
-      camera.position.set(0, 10, 0);
+      camera = new THREE.PerspectiveCamera(90, 1, 1, 700);
+      camera.position.set(15, 30, 30);
       scene.add(camera);
 
       controls = new THREE.OrbitControls(camera, element);
@@ -101,13 +110,28 @@
       mesh.rotation.x = -Math.PI / 2;
       scene.add(mesh);
 	  
-	  var box = new THREE.BoxGeometry( 10, 10, 10 );
-	  //var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-	  var cube = new THREE.Mesh( box, material );
-	  cube.translateX(20);
-	  cube.translateY(20);
-	  cube.translateZ(20);
-	  scene.add( cube );
+	  var sphere = new THREE.SphereGeometry( 3, 16, 16 );
+	  var material = new THREE.MeshBasicMaterial( { 
+		  color: 0xac154b,
+		  specular: 0xffffff,
+		  shininess: 20,
+		  wireframe:true
+	  } );
+	  
+	  // Draw atoms
+	  var sides = 6;
+	  var center = 30;
+	  var radius = 10;
+	  var secangle = 2*Math.PI/sides;
+	  var height = 10;
+	  for (i=0; i<sides; i++){
+		var mesh = new THREE.Mesh( sphere, material );
+	  	mesh.position.x = center+radius*Math.cos(secangle*i);
+		mesh.position.z = center+radius*Math.sin(secangle*i);
+		mesh.position.y = height;
+	  	scene.add( mesh );
+		spheres.push( mesh );
+  	  }	
 
       window.addEventListener('resize', resize, false);
       setTimeout(resize, 1);
