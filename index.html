@@ -31,6 +31,7 @@
     var effect, controls;
     var element, container;
 	var spheres = [];
+	var ambientLight, light;
 	
 	// Object for keeping track of time
     var clock = new THREE.Clock();
@@ -42,7 +43,7 @@
     function init() {
 	  
 	  // Renderer
-      renderer = new THREE.WebGLRenderer();
+      renderer = new THREE.WebGLRenderer({antialias: true});
 	  renderer.shadowMapEnabled = true;
 	  renderer.shadowMapType = THREE.PCFSoftShadowMap;
 	  
@@ -58,11 +59,8 @@
 	  // ParallaxBarrierEffect, StereoEffect, AnaglyphEffect
       effect = new THREE.StereoEffect(renderer);
 
-      scene = new THREE.Scene();
-
       camera = new THREE.PerspectiveCamera(90, 1, 1, 700);
-      camera.position.set(15, 30, 30);
-      scene.add(camera);
+      camera.position.set(-200, 400, 30);
 
       controls = new THREE.OrbitControls(camera, element);
       controls.rotateUp(Math.PI / 4);
@@ -89,22 +87,13 @@
       }
       window.addEventListener('deviceorientation', setOrientationControls, true);
 
-
-	  var spotLight = new THREE.SpotLight( 0xffffff, 0.5);
-	  spotLight.position.set( 100, 100, 100 );
+	// Light
+	ambientLight = new THREE.AmbientLight(0xFFFFFF);
+	light = new THREE.DirectionalLight(0xFFFFFF, 0.7);
+	light.position.set(-800, 900, 300);
 	  
-	  spotLight.castShadow = true;
-
-	  spotLight.shadowMapWidth = 1024;
-	  spotLight.shadowMapHeight = 1024;
-
-	  spotLight.shadowCameraNear = 10;
-	  spotLight.shadowCameraFar = 70;
-	  spotLight.shadowCameraFov = 20;
-
-	  scene.add( spotLight );
-	  
-      
+	  drawScene();
+      /*
 
       var texture = THREE.ImageUtils.loadTexture(
         'textures/patterns/checker.png'
@@ -128,37 +117,61 @@
       mesh.rotation.x = -Math.PI / 2;
       scene.add(mesh);
 	  
-	  // Draw atoms
-	  var radius_of_atoms = 3;
-	  var res = 32;
-	  var sides = 6;
-	  var center = 30;
-	  var radius_of_molecule = 10;
-	  var secangle = 2*Math.PI/sides;
-	  var height = 2;
-	  var sphere = new THREE.SphereGeometry( radius_of_atoms, res, res );
-	  var material = new THREE.MeshLambertMaterial( { 
-		  color: 0xC94141
-	  } );
-	  var ambientLight = new THREE.AmbientLight( 0xffffff );
-	  scene.add( ambientLight );
-	  var ka = 0.7;
-	  material.ambient.setRGB(material.color.r*ka, material.color.g*ka, material.color.b*ka);
+	  */
 	  
-	  for (i=0; i<sides; i++){
-		var mesh = new THREE.Mesh( sphere, material );
-	  	mesh.position.x = center+radius_of_molecule*Math.cos(secangle*i);
-		mesh.position.z = center+radius_of_molecule*Math.sin(secangle*i);
-		mesh.position.y = height;
-		mesh.castShadow= true;
-		mesh.receiveShadow = true;
-	  	scene.add( mesh );
-		spheres.push( mesh );
-  	  }	
 
       window.addEventListener('resize', resize, false);
       setTimeout(resize, 1);
     }
+	
+	// Draw scene
+	function drawScene(){
+		scene = new THREE.Scene();
+		scene.fog = new THREE.Fog(0x808080, 2000, 4000);
+		scene.add(camera);
+		scene.add(ambientLight);
+		scene.add(light);
+		
+		var plane_size=1000;
+		
+  	  // Draw atoms
+  	  var radius_of_atoms = 40;
+  	  var res = 32;
+  	  var sides = 6;
+  	  var center = 0;
+  	  var radius_of_molecule = 150;
+  	  var secangle = 2*Math.PI/sides;
+  	  var height = radius_of_atoms;
+  	  var sphere2 = new THREE.SphereGeometry( radius_of_atoms, res, res );
+	var material = new THREE.MeshLambertMaterial({color:0xe10080});
+	material.ambient.setRGB(material.color.r*0.4,material.color.g*0.4,material.color.b*0.4);
+	  
+  	  for (i=0; i<sides; i++){
+  		var meshs = new THREE.Mesh( sphere2, material );
+  	  	meshs.position.x = center+radius_of_molecule*Math.cos(secangle*i);
+  		meshs.position.z = center+radius_of_molecule*Math.sin(secangle*i);
+  		meshs.position.y = height;
+  		meshs.castShadow= true;
+  		meshs.receiveShadow = true;
+  	  	scene.add( meshs );
+    	  }
+		
+		var plane = new THREE.PlaneGeometry(plane_size,plane_size,32);
+		var material2 = new THREE.MeshLambertMaterial({color:0xeeeeee,polygonOffset: true, polygonOffsetFactor: 1.0, polygonOffsetUnits: 4.0});
+		//material2.ambient.setRGB(material2.color.r*0.4,material2.color.g*0.4,material2.color.b*0.4);
+		var mesh2 = new THREE.Mesh(plane,material2);
+		mesh2.position.set(0,0,0);
+		mesh2.rotation.x = -Math.PI/2;
+		scene.add(mesh2);
+		
+		var gridlines = new THREE.PlaneGeometry(plane_size,plane_size,plane_size*0.01,plane_size*0.01);
+		var material3 = new THREE.MeshBasicMaterial({color:0x000000,wireframe:true});
+		var mesh3 = new THREE.Mesh(gridlines,material3);
+		mesh3.position.set(0,0,0);
+		mesh3.rotation.x = -Math.PI/2;
+		scene.add(mesh3);
+		
+	}
 
     function resize() {
       var width = container.offsetWidth;
