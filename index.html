@@ -134,27 +134,66 @@
 		
 		var plane_size=1000;
 		
-  	  // Draw atoms
-  	  var radius_of_atoms = 40;
-  	  var res = 32;
-  	  var sides = 6;
-  	  var center = 0;
-  	  var radius_of_molecule = 150;
-  	  var secangle = 2*Math.PI/sides;
-  	  var height = radius_of_atoms;
-  	  var sphere2 = new THREE.SphereGeometry( radius_of_atoms, res, res );
-	var material = new THREE.MeshLambertMaterial({color:0xe10080});
-	material.ambient.setRGB(material.color.r*0.4,material.color.g*0.4,material.color.b*0.4);
+  	  	// Draw atoms
+  	  	var atom_radius = 40;
+  	  	var res = 32;
+  	  	var sides = 6;
+  	  	var center = 0;
+  	  	var molecule_radius = 150;
+  	  	var secangle = 2*Math.PI/sides;
+  	  	var atoms = new THREE.SphereGeometry(atom_radius,res,res);
+		
+		var bond_radius = 5;
+		var bond_length = molecule_radius*Math.sin(secangle/2);
+	  	var bonds = new THREE.CylinderGeometry(bond_radius,bond_radius,bond_length,res);
+		var material = new THREE.MeshLambertMaterial({color:0xe10080});
+		material.ambient.setRGB(material.color.r*0.4,material.color.g*0.4,material.color.b*0.4);
+		var material2 = new THREE.MeshLambertMaterial({color:0x011180});
+		material2.ambient.setRGB(material2.color.r*0.4,material2.color.g*0.4,material2.color.b*0.4);
 	  
-  	  for (i=0; i<sides; i++){
-  		var meshs = new THREE.Mesh( sphere2, material );
-  	  	meshs.position.x = center+radius_of_molecule*Math.cos(secangle*i);
-  		meshs.position.z = center+radius_of_molecule*Math.sin(secangle*i);
-  		meshs.position.y = height;
-  		meshs.castShadow= true;
-  		meshs.receiveShadow = true;
-  	  	scene.add( meshs );
-    	  }
+		for (i=0; i<sides; i++){
+			var mat = material;
+			if (i==0){
+				mat = material2;
+			}
+			var mesh_atoms = new THREE.Mesh( atoms, mat );
+			mesh_atoms.position.x = center+molecule_radius*Math.cos(secangle*i);
+			mesh_atoms.position.z = center+molecule_radius*Math.sin(secangle*i);
+			mesh_atoms.position.y = atom_radius;
+  	  		scene.add( mesh_atoms );
+			
+			var mesh_bonds = new THREE.Mesh(bonds, mat);
+			mesh_bonds.rotation.order = "ZYX"
+			mesh_bonds.rotation.x = -Math.PI/2;
+			mesh_bonds.rotation.y = -Math.PI/6-i*Math.PI/3;
+			var midpoint_x = (center+molecule_radius*Math.cos(secangle*i)+center+molecule_radius*Math.cos(secangle*(i+1)))/2;
+			mesh_bonds.position.x = (midpoint_x+mesh_atoms.position.x)/2;
+			var midpoint_z = (center+molecule_radius*Math.sin(secangle*i)+center+molecule_radius*Math.sin(secangle*(i+1)))/2;
+			mesh_bonds.position.z = (midpoint_z+mesh_atoms.position.z)/2;
+			mesh_bonds.position.y = atom_radius+bond_radius;
+			scene.add( mesh_bonds );
+			
+			var mesh_bonds2 = new THREE.Mesh(bonds, mat);
+			mesh_bonds2.rotation.order = "ZYX"
+			mesh_bonds2.rotation.x = -Math.PI/2;
+			mesh_bonds2.rotation.y = Math.PI/6-i*Math.PI/3;
+			var midpoint_x = (center+molecule_radius*Math.cos(secangle*i)+center+molecule_radius*Math.cos(secangle*(i-1)))/2;
+			mesh_bonds2.position.x = (midpoint_x+mesh_atoms.position.x)/2;
+			var midpoint_z = (center+molecule_radius*Math.sin(secangle*i)+center+molecule_radius*Math.sin(secangle*(i-1)))/2;
+			mesh_bonds2.position.z = (midpoint_z+mesh_atoms.position.z)/2;
+			mesh_bonds2.position.y = atom_radius+bond_radius;
+			scene.add( mesh_bonds2 );
+			
+			var mesh_bonds3 = new THREE.Mesh(bonds, mat);
+			mesh_bonds3.rotation.order = "ZYX"
+			mesh_bonds3.rotation.x = -Math.PI/2;
+			mesh_bonds3.rotation.y = -Math.PI/6-(i+1)*Math.PI/3;
+			mesh_bonds3.position.x = center+(molecule_radius+bond_length-atom_radius)*Math.cos(secangle*i);
+			mesh_bonds3.position.z = center+(molecule_radius+bond_length-atom_radius)*Math.sin(secangle*i);
+			mesh_bonds3.position.y = atom_radius+bond_radius;
+			scene.add( mesh_bonds3 );
+    	}
+		  
 		
 		var plane = new THREE.PlaneGeometry(plane_size,plane_size,32);
 		var material2 = new THREE.MeshLambertMaterial({color:0xeeeeee,polygonOffset: true, polygonOffsetFactor: 1.0, polygonOffsetUnits: 4.0});
