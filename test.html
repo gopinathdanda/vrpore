@@ -62,7 +62,7 @@
 	// Draw scene
 	function drawScene(){
 		scene = new THREE.Scene();
-		scene.fog = new THREE.Fog(0x808080, 2000, 4000);
+		scene.fog = new THREE.Fog(0x808080, 5000, 10000);
 		scene.add(camera);
 		scene.add(ambientLight);
 		scene.add(light);
@@ -87,51 +87,59 @@
 		var material2 = new THREE.MeshLambertMaterial({color:0x011180});
 		material2.ambient.setRGB(material2.color.r*0.4,material2.color.g*0.4,material2.color.b*0.4);
 	  	
-		var x_dir = 4;
-		for (j=0; j<x_dir; j++){
-			centerX = (molecule_radius*2+bond_length*2)*j;
-			for (i=0; i<sides; i++){
-				var mat = material;
-				if (i==0){
-					mat = material2;
-				}
-				var mesh_atoms = new THREE.Mesh( atoms, mat );
-				mesh_atoms.position.x = centerX+molecule_radius*Math.cos(secangle*i);
-				mesh_atoms.position.z = centerZ+molecule_radius*Math.sin(secangle*i);
-				mesh_atoms.position.y = atom_radius;
-	  	  		scene.add( mesh_atoms );
+		var x_dir = 2;
+		var z_dir = 2;
+		var centerXK = 0;
+		for (k=0; k<z_dir; k++){
+			var zvec_angle = 2*Math.PI/sides;
+			centerZ = (molecule_radius*2+bond_length*2)*k*Math.sin(zvec_angle);
+			centerXK = (molecule_radius*2+bond_length*2)*k*Math.cos(zvec_angle);
+			for (j=0; j<x_dir; j++){
+				centerX = centerXK+(molecule_radius*2+bond_length*2)*j;
+				for (i=0; i<sides; i++){
+					var mat = material;
+					if (i==0){
+						mat = material2;
+					}
+					var mesh_atoms = new THREE.Mesh( atoms, mat );
+					mesh_atoms.position.x = centerX+molecule_radius*Math.cos(secangle*i);
+					mesh_atoms.position.z = centerZ+molecule_radius*Math.sin(secangle*i);
+					mesh_atoms.position.y = atom_radius;
+		  	  		scene.add( mesh_atoms );
+					
+					//for (b=0; b<sides/2; b++)
+					var mesh_bonds = new THREE.Mesh(bonds, mat);
+					mesh_bonds.rotation.order = "ZYX"
+					mesh_bonds.rotation.x = -Math.PI/2;
+					mesh_bonds.rotation.y = -Math.PI/sides-i*2*Math.PI/sides;
+					var midpoint_x = (centerX+molecule_radius*Math.cos(secangle*i)+centerX+molecule_radius*Math.cos(secangle*(i+1)))/2;
+					mesh_bonds.position.x = (midpoint_x+mesh_atoms.position.x)/2;
+					var midpoint_z = (centerZ+molecule_radius*Math.sin(secangle*i)+centerZ+molecule_radius*Math.sin(secangle*(i+1)))/2;
+					mesh_bonds.position.z = (midpoint_z+mesh_atoms.position.z)/2;
+					mesh_bonds.position.y = atom_radius+bond_radius;
+					scene.add( mesh_bonds );
 			
-				var mesh_bonds = new THREE.Mesh(bonds, mat);
-				mesh_bonds.rotation.order = "ZYX"
-				mesh_bonds.rotation.x = -Math.PI/2;
-				mesh_bonds.rotation.y = -Math.PI/6-i*Math.PI/3;
-				var midpoint_x = (centerX+molecule_radius*Math.cos(secangle*i)+centerX+molecule_radius*Math.cos(secangle*(i+1)))/2;
-				mesh_bonds.position.x = (midpoint_x+mesh_atoms.position.x)/2;
-				var midpoint_z = (centerZ+molecule_radius*Math.sin(secangle*i)+centerZ+molecule_radius*Math.sin(secangle*(i+1)))/2;
-				mesh_bonds.position.z = (midpoint_z+mesh_atoms.position.z)/2;
-				mesh_bonds.position.y = atom_radius+bond_radius;
-				scene.add( mesh_bonds );
+					var mesh_bonds2 = new THREE.Mesh(bonds, mat);
+					mesh_bonds2.rotation.order = "ZYX"
+					mesh_bonds2.rotation.x = -Math.PI/2;
+					mesh_bonds2.rotation.y = Math.PI/sides-i*2*Math.PI/sides;
+					var midpoint_x = (centerX+molecule_radius*Math.cos(secangle*i)+centerX+molecule_radius*Math.cos(secangle*(i-1)))/2;
+					mesh_bonds2.position.x = (midpoint_x+mesh_atoms.position.x)/2;
+					var midpoint_z = (centerZ+molecule_radius*Math.sin(secangle*i)+centerZ+molecule_radius*Math.sin(secangle*(i-1)))/2;
+					mesh_bonds2.position.z = (midpoint_z+mesh_atoms.position.z)/2;
+					mesh_bonds2.position.y = atom_radius+bond_radius;
+					scene.add( mesh_bonds2 );
 			
-				var mesh_bonds2 = new THREE.Mesh(bonds, mat);
-				mesh_bonds2.rotation.order = "ZYX"
-				mesh_bonds2.rotation.x = -Math.PI/2;
-				mesh_bonds2.rotation.y = Math.PI/6-i*Math.PI/3;
-				var midpoint_x = (centerX+molecule_radius*Math.cos(secangle*i)+centerX+molecule_radius*Math.cos(secangle*(i-1)))/2;
-				mesh_bonds2.position.x = (midpoint_x+mesh_atoms.position.x)/2;
-				var midpoint_z = (centerZ+molecule_radius*Math.sin(secangle*i)+centerZ+molecule_radius*Math.sin(secangle*(i-1)))/2;
-				mesh_bonds2.position.z = (midpoint_z+mesh_atoms.position.z)/2;
-				mesh_bonds2.position.y = atom_radius+bond_radius;
-				scene.add( mesh_bonds2 );
-			
-				var mesh_bonds3 = new THREE.Mesh(bonds, mat);
-				mesh_bonds3.rotation.order = "ZYX"
-				mesh_bonds3.rotation.x = -Math.PI/2;
-				mesh_bonds3.rotation.y = -Math.PI/6-(i+1)*Math.PI/3;
-				mesh_bonds3.position.x = centerX+(molecule_radius+bond_length-atom_radius)*Math.cos(secangle*i);
-				mesh_bonds3.position.z = centerZ+(molecule_radius+bond_length-atom_radius)*Math.sin(secangle*i);
-				mesh_bonds3.position.y = atom_radius+bond_radius;
-				scene.add( mesh_bonds3 );
-	    	}
+					var mesh_bonds3 = new THREE.Mesh(bonds, mat);
+					mesh_bonds3.rotation.order = "ZYX"
+					mesh_bonds3.rotation.x = -Math.PI/2;
+					mesh_bonds3.rotation.y = -Math.PI/sides-(i+1)*2*Math.PI/sides;
+					mesh_bonds3.position.x = centerX+(molecule_radius+bond_length-atom_radius)*Math.cos(secangle*i);
+					mesh_bonds3.position.z = centerZ+(molecule_radius+bond_length-atom_radius)*Math.sin(secangle*i);
+					mesh_bonds3.position.y = atom_radius+bond_radius;
+					scene.add( mesh_bonds3 );
+		    	}
+			}
 		}
 		  
 		
