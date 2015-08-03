@@ -93,10 +93,10 @@
 	light.position.set(-200, 2000, 500);
 	light.shadowCameraNear = 5;
 	light.shadowCameraFar = 3000;
-	light.shadowCameraLeft = -3000;
-	light.shadowCameraRight = 3000;
-	light.shadowCameraTop = 3000;
-	light.shadowCameraBottom = -3000;
+	light.shadowCameraLeft = -2000;
+	light.shadowCameraRight = 2000;
+	light.shadowCameraTop = 2000;
+	light.shadowCameraBottom = -2000;
 	light.castShadow = true;
 	light.shadowDarkness = 0.3;
 	//light.shadowCameraVisible = true;
@@ -112,7 +112,7 @@
 	// Draw scene
 	function drawScene(){
 		scene = new THREE.Scene();
-		scene.fog = new THREE.Fog(0x808080, 3000, 10000);
+		scene.fog = new THREE.Fog(0x000000, 1, 2000);
 		scene.add(camera);
 		scene.add(ambientLight);
 		scene.add(light);
@@ -145,7 +145,7 @@
 		
   	  	// Draw atoms
   	  	var atom_radius = 30;
-		var height = 50;
+		var height = 20;
   	  	var res = 32;
   	  	var sides = 6;
   	  	var molecule_radius = 150;
@@ -161,15 +161,15 @@
 		var material2 = new THREE.MeshLambertMaterial({color:0x011180});
 		material2.ambient.setRGB(material2.color.r*ka,material2.color.g*ka,material2.color.b*ka);
 	  	
-		var x_repeat = 2;
-		var z_repeat = 2;
+		var x_repeat = 8;
+		var z_repeat = 10;
 		var centerXK = 0;
 		var centerX;
 		var centerZ;
 		for (k=0; k<z_repeat; k++){
 			var zvec_angle = 2*Math.PI/sides;
-	  	  	var centerXO = 0;
-			var centerZO = 0;
+	  	  	var centerXO = -(x_repeat-1)*(molecule_radius+bond_length)-(z_repeat-1)*(molecule_radius+bond_length)*Math.cos(zvec_angle);
+			var centerZO = -(z_repeat-1)*(molecule_radius+bond_length)*Math.sin(zvec_angle);
 			centerZ = centerZO+(molecule_radius*2+bond_length*2)*k*Math.sin(zvec_angle);
 			centerXK = centerXO+(molecule_radius*2+bond_length*2)*k*Math.cos(zvec_angle);
 			for (j=0; j<x_repeat; j++){
