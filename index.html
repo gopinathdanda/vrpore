@@ -155,7 +155,7 @@
 		var bond_radius = 5;
 		var bond_length = molecule_radius*Math.sin(secangle/2);
 	  	var bonds = new THREE.CylinderGeometry(bond_radius,bond_radius,bond_length,res);
-		var material = new THREE.MeshLambertMaterial({color:0xe0077BE});
+		var material = new THREE.MeshLambertMaterial({color:0xE70E38});
 		var ka = 0.5;
 		material.ambient.setRGB(material.color.r*ka,material.color.g*ka,material.color.b*ka);
 		var material2 = new THREE.MeshLambertMaterial({color:0x011180});
@@ -230,7 +230,7 @@
 		  
 		
 		var plane = new THREE.PlaneGeometry(plane_size,plane_size,32);
-		var material2 = new THREE.MeshLambertMaterial({color:0xcccccc,polygonOffset: true, polygonOffsetFactor: 1.0, polygonOffsetUnits: 4.0});
+		var material2 = new THREE.MeshLambertMaterial({color:0xE7A446,polygonOffset: true, polygonOffsetFactor: 1.0, polygonOffsetUnits: 4.0});
 		material2.ambient.setRGB(material2.color.r*0.4,material2.color.g*0.4,material2.color.b*0.4);
 		var mesh2 = new THREE.Mesh(plane,material2);
 		mesh2.position.set(0,0,0);
@@ -240,7 +240,7 @@
 		scene.add(mesh2);
 		
 		var gridlines = new THREE.PlaneGeometry(plane_size,plane_size,plane_size*0.01,plane_size*0.01);
-		var material3 = new THREE.MeshBasicMaterial({color:0x000000,wireframe:true});
+		var material3 = new THREE.MeshBasicMaterial({color:0xA76B21,wireframe:true});
 		var mesh3 = new THREE.Mesh(gridlines,material3);
 		mesh3.position.set(0,0,0);
 		mesh3.rotation.x = -Math.PI/2;
