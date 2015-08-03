@@ -90,34 +90,19 @@
 	// Light
 	ambientLight = new THREE.AmbientLight(0xFFFFFF);
 	light = new THREE.DirectionalLight(0xFFFFFF, 0.5);
-	light.position.set(-800, 900, 300);
+	light.position.set(-200, 2000, 500);
+	light.shadowCameraNear = 5;
+	light.shadowCameraFar = 3000;
+	light.shadowCameraLeft = -3000;
+	light.shadowCameraRight = 3000;
+	light.shadowCameraTop = 3000;
+	light.shadowCameraBottom = -3000;
+	light.castShadow = true;
+	light.shadowDarkness = 0.3;
+	//light.shadowCameraVisible = true;
+	
 	  
 	  drawScene();
-      /*
-
-      var texture = THREE.ImageUtils.loadTexture(
-        'textures/patterns/checker.png'
-      );
-      texture.wrapS = THREE.RepeatWrapping;
-      texture.wrapT = THREE.RepeatWrapping;
-      texture.repeat = new THREE.Vector2(50, 50);
-      texture.anisotropy = renderer.getMaxAnisotropy();
-
-      var material = new THREE.MeshPhongMaterial({
-        color: 0xffffff,
-        specular: 0xffffff,
-        shininess: 20,
-        shading: THREE.FlatShading,
-        map: texture
-      });
-
-      var geometry = new THREE.PlaneGeometry(1000, 1000);	  
-
-      var mesh = new THREE.Mesh(geometry, material);
-      mesh.rotation.x = -Math.PI / 2;
-      scene.add(mesh);
-	  
-	  */
 	  
 
       window.addEventListener('resize', resize, false);
@@ -127,15 +112,40 @@
 	// Draw scene
 	function drawScene(){
 		scene = new THREE.Scene();
-		//scene.fog = new THREE.Fog(0x808080, 5000, 10000);
+		scene.fog = new THREE.Fog(0x808080, 3000, 10000);
 		scene.add(camera);
 		scene.add(ambientLight);
 		scene.add(light);
 		
-		var plane_size=4000;
+		/*
+        var texture = THREE.ImageUtils.loadTexture(
+          'textures/patterns/checker.png'
+        );
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat = new THREE.Vector2(50, 50);
+        texture.anisotropy = renderer.getMaxAnisotropy();
+		
+        var material_tex = new THREE.MeshPhongMaterial({
+          color: 0xffffff,
+          specular: 0xffffff,
+          shininess: 20,
+          shading: THREE.FlatShading,
+          map: texture
+        });
+		
+        var geometry = new THREE.PlaneGeometry(1000, 1000);	  
+        var mesh = new THREE.Mesh(geometry, material);
+        mesh.rotation.x = -Math.PI / 2;
+        scene.add(mesh);
+	    
+  	    */
+		
+		var plane_size=7000;
 		
   	  	// Draw atoms
   	  	var atom_radius = 30;
+		var height = 50;
   	  	var res = 32;
   	  	var sides = 6;
   	  	var molecule_radius = 150;
@@ -145,20 +155,21 @@
 		var bond_radius = 5;
 		var bond_length = molecule_radius*Math.sin(secangle/2);
 	  	var bonds = new THREE.CylinderGeometry(bond_radius,bond_radius,bond_length,res);
-		var material = new THREE.MeshLambertMaterial({color:0xe10080});
-		material.ambient.setRGB(material.color.r*0.4,material.color.g*0.4,material.color.b*0.4);
+		var material = new THREE.MeshLambertMaterial({color:0xe0077BE});
+		var ka = 0.5;
+		material.ambient.setRGB(material.color.r*ka,material.color.g*ka,material.color.b*ka);
 		var material2 = new THREE.MeshLambertMaterial({color:0x011180});
-		material2.ambient.setRGB(material2.color.r*0.4,material2.color.g*0.4,material2.color.b*0.4);
+		material2.ambient.setRGB(material2.color.r*ka,material2.color.g*ka,material2.color.b*ka);
 	  	
-		var x_repeat = 10;
-		var z_repeat = 15;
+		var x_repeat = 2;
+		var z_repeat = 2;
 		var centerXK = 0;
 		var centerX;
 		var centerZ;
 		for (k=0; k<z_repeat; k++){
 			var zvec_angle = 2*Math.PI/sides;
-	  	  	var centerXO = -4000;
-			var centerZO = -4000;
+	  	  	var centerXO = 0;
+			var centerZO = 0;
 			centerZ = centerZO+(molecule_radius*2+bond_length*2)*k*Math.sin(zvec_angle);
 			centerXK = centerXO+(molecule_radius*2+bond_length*2)*k*Math.cos(zvec_angle);
 			for (j=0; j<x_repeat; j++){
@@ -171,7 +182,9 @@
 					var mesh_atoms = new THREE.Mesh( atoms, mat );
 					mesh_atoms.position.x = centerX+molecule_radius*Math.cos(secangle*i);
 					mesh_atoms.position.z = centerZ+molecule_radius*Math.sin(secangle*i);
-					mesh_atoms.position.y = atom_radius;
+					mesh_atoms.position.y = atom_radius+height;
+					mesh_atoms.castShadow = true;
+					mesh_atoms.receiveShadow = true;
 		  	  		scene.add( mesh_atoms );
 					
 					//for (b=0; b<sides/2; b++)
@@ -183,7 +196,9 @@
 					mesh_bonds.position.x = (midpoint_x+mesh_atoms.position.x)/2;
 					var midpoint_z = (centerZ+molecule_radius*Math.sin(secangle*i)+centerZ+molecule_radius*Math.sin(secangle*(i+1)))/2;
 					mesh_bonds.position.z = (midpoint_z+mesh_atoms.position.z)/2;
-					mesh_bonds.position.y = atom_radius+bond_radius;
+					mesh_bonds.position.y = atom_radius+bond_radius+height;
+					mesh_bonds.castShadow = true;
+					mesh_bonds.receiveShadow = true;
 					scene.add( mesh_bonds );
 			
 					var mesh_bonds2 = new THREE.Mesh(bonds, mat);
@@ -194,7 +209,9 @@
 					mesh_bonds2.position.x = (midpoint_x+mesh_atoms.position.x)/2;
 					var midpoint_z = (centerZ+molecule_radius*Math.sin(secangle*i)+centerZ+molecule_radius*Math.sin(secangle*(i-1)))/2;
 					mesh_bonds2.position.z = (midpoint_z+mesh_atoms.position.z)/2;
-					mesh_bonds2.position.y = atom_radius+bond_radius;
+					mesh_bonds2.position.y = atom_radius+bond_radius+height;
+					mesh_bonds2.castShadow = true;
+					mesh_bonds2.receiveShadow = true;
 					scene.add( mesh_bonds2 );
 			
 					var mesh_bonds3 = new THREE.Mesh(bonds, mat);
@@ -203,7 +220,9 @@
 					mesh_bonds3.rotation.y = -Math.PI/sides-(i+1)*2*Math.PI/sides;
 					mesh_bonds3.position.x = centerX+(molecule_radius+bond_length-atom_radius)*Math.cos(secangle*i);
 					mesh_bonds3.position.z = centerZ+(molecule_radius+bond_length-atom_radius)*Math.sin(secangle*i);
-					mesh_bonds3.position.y = atom_radius+bond_radius;
+					mesh_bonds3.position.y = atom_radius+bond_radius+height;
+					mesh_bonds3.castShadow = true;
+					mesh_bonds3.receiveShadow = true;
 					scene.add( mesh_bonds3 );
 		    	}
 			}
@@ -216,14 +235,18 @@
 		var mesh2 = new THREE.Mesh(plane,material2);
 		mesh2.position.set(0,0,0);
 		mesh2.rotation.x = -Math.PI/2;
-		//scene.add(mesh2);
+		mesh2.castShadow = false;
+		mesh2.receiveShadow = true;
+		scene.add(mesh2);
 		
 		var gridlines = new THREE.PlaneGeometry(plane_size,plane_size,plane_size*0.01,plane_size*0.01);
 		var material3 = new THREE.MeshBasicMaterial({color:0x000000,wireframe:true});
 		var mesh3 = new THREE.Mesh(gridlines,material3);
 		mesh3.position.set(0,0,0);
 		mesh3.rotation.x = -Math.PI/2;
-		//scene.add(mesh3);
+		mesh3.castShadow = false;
+		mesh3.receiveShadow = true;
+		scene.add(mesh3);
 		
 	}
 
