@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>VRPore - 3D Demo of a Nanopore</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+      body {
+        margin: 0px;
+        overflow: hidden;
+      }
+      #example {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="example"></div>
+
+  <script src="js/third-party/threejs/three.js"></script>
+  <script src="js/third-party/threejs/OrbitControls.js"></script>
+
+  <script>
+    var camera, scene, renderer;
+	var cameraControls;
+	var ambientLight, light;
+	var clock = new THREE.Clock();
+	
+	// Initialize renderer, lights and camera
+	function init(){
+		var canvasWidth = window.innerWidth;
+		var canvasHeight = window.innerHeight;
+		var canvasRatio = canvasWidth/canvasHeight;
+		
+		// Renderer
+		renderer = new THREE.WebGLRenderer({antialias: true});
+		renderer.setSize( canvasWidth, canvasHeight );
+		renderer.setClearColor(0xAAAAAA, 1.0);
+		renderer.gammaInput = true;
+		renderer.gammaOutput = true;
+  	  	renderer.shadowMapEnabled = true;
+  	  	renderer.shadowMapType = THREE.PCFSoftShadowMap;
+		
+		// Camera
+		camera = new THREE.PerspectiveCamera(90, canvasRatio, 1, 4000);
+		camera.position.set(-200, 400, 30);
+		//camera.position.set(0,1000,0);
+		//camera.lookAt(0,0,0);
+		
+		// Light
+		ambientLight = new THREE.AmbientLight(0xFFFFFF);
+		light = new THREE.DirectionalLight(0xFFFFFF, 0.8);
+		light.position.set(-200, 2000, 500);
+		light.shadowCameraNear = 5;
+		light.shadowCameraFar = 3000;
+		light.shadowCameraLeft = -2000;
+		light.shadowCameraRight = 2000;
+		light.shadowCameraTop = 2000;
+		light.shadowCameraBottom = -2000;
+		light.castShadow = true;
+		light.shadowDarkness = 0.3;
+		light.shadowCameraVisible = true;
+		
+		// Controls
+		cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
+		cameraControls.target.set(0,0,0);
+	}
+	
+	// Draw scene
+	function drawScene(){
+		scene = new THREE.Scene();
+		//scene.fog = new THREE.Fog(0x000000, 1, 2000);
+		scene.add(camera);
+		scene.add(ambientLight);
+		scene.add(light);
+		
+		var mat = new THREE.MeshLambertMaterial({color:0x011180, polygonOffset:true, polygonOffsetFactor:1.0, polygonOffsetUnits:1.0});
+		var mat3 = new THREE.MeshLambertMaterial({color:0x011180, polygonOffset:true, polygonOffsetFactor:1.0, polygonOffsetUnits:1.0, wireframe:true});
+		var ka = 0.5;
+		mat.ambient.setRGB(mat.color.r*ka,mat.color.g*ka,mat.color.b*ka);
+		var mat2 = new THREE.MeshLambertMaterial({color:0xdddddd, side: THREE.DoubleSide});
+		mat2.ambient.setRGB(mat2.color.r*ka,mat2.color.g*ka,mat2.color.b*ka);
+		var wall1 = new THREE.Mesh( new THREE.BoxGeometry(100,100,50) , mat );
+		wall1.position.y=50;
+		scene.add(wall1);
+		
+		var ground = new THREE.Mesh( new THREE.PlaneGeometry(1000,1000), mat2);
+		ground.rotation.x = Math.PI/2;
+		scene.add(ground);
+		
+		var s = new THREE.Mesh( new THREE.PlaneGeometry(1000,1000,10,10), mat3);
+		s.rotation.x = Math.PI/2;
+		scene.add(s);
+		
+		}
+		  
+		
+	
+	// Add to HTML page
+	function addToDOM(){
+		var container = document.getElementById('example');
+		container.appendChild(renderer.domElement);
+	}
+	
+	// Animate
+	function animate(){
+		window.requestAnimationFrame(animate);
+		render();
+	}
+	
+	// Render scene and camera
+	function render(){
+		var delta = clock.getDelta();
+		cameraControls.update(delta);
+		renderer.render(scene,camera);
+	}
+	
+	try{
+		init();
+		drawScene();
+		addToDOM();
+		animate();
+	}catch(e){
+		
+	}
+  </script>
+  </body>
+</html>
